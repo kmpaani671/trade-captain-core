@@ -202,6 +202,61 @@ const schema = defineSchema(
     }).index("by_symbol", ["symbol"]),
 
     /**
+     * Demo accounts: a completely separate simulated ledger. Funds shown
+     * here are fictitious and never presented as real balances. Real
+     * balances come only from connected providers.
+     */
+    demoAccounts: defineTable({
+      userId: v.id("users"),
+      cash: v.number(),
+      startingCash: v.number(),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    }).index("by_user", ["userId"]),
+
+    /** Demo positions keyed by user + symbol. Not real holdings. */
+    demoPositions: defineTable({
+      userId: v.id("users"),
+      symbol: v.string(),
+      qty: v.number(),
+      avgPrice: v.number(),
+    })
+      .index("by_user", ["userId"])
+      .index("by_user_symbol", ["userId", "symbol"]),
+
+    /**
+     * Semi-automatic trade proposals: a bot/AI may propose, but a human
+     * must approve within the TTL. Only DEMO mode executes until a real
+     * trading-enabled provider connection is configured.
+     */
+    tradeProposals: defineTable({
+      userId: v.id("users"),
+      mode: v.union(v.literal("DEMO"), v.literal("LIVE")),
+      symbol: v.string(),
+      side: v.union(v.literal("BUY"), v.literal("SELL")),
+      notional: v.number(),
+      strategy: v.string(),
+      rationale: v.optional(v.string()),
+      status: v.union(
+        v.literal("PENDING"),
+        v.literal("DECLINED"),
+        v.literal("EXECUTED"),
+        v.literal("EXPIRED"),
+        v.literal("EXECUTING"),
+      ),
+      createdAt: v.number(),
+      expiresAt: v.number(),
+    }).index("by_user", ["userId"]),
+
+    /** Audit trail of sensitive financial events. */
+    auditLog: defineTable({
+      userId: v.id("users"),
+      event: v.string(),
+      data: v.optional(v.string()),
+      createdAt: v.number(),
+    }).index("by_user", ["userId"]),
+
+    /**
      * Global compliance flags. Regulated functionality can be disabled
      * per country/state/territory without a deploy.
      */
