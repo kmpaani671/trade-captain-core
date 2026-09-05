@@ -20,6 +20,7 @@ const Portfolio = lazy(() => import("./pages/Portfolio.tsx"));
 const Wallet = lazy(() => import("./pages/Wallet.tsx"));
 const Models = lazy(() => import("./pages/Models.tsx"));
 const Bots = lazy(() => import("./pages/Bots.tsx"));
+const Proposals = lazy(() => import("./pages/Proposals.tsx"));
 const Membership = lazy(() => import("./pages/Membership.tsx"));
 const Settings = lazy(() => import("./pages/Settings.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
@@ -34,6 +35,7 @@ const TITLES: Record<string, string> = {
   "/wallet": "Connected Accounts — TradeCaptain",
   "/models": "AI Models — TradeCaptain",
   "/bots": "Trading Bots — TradeCaptain",
+  "/proposals": "Trade Proposals — TradeCaptain",
   "/membership": "Membership — TradeCaptain",
   "/settings": "Settings — TradeCaptain",
 };
@@ -211,6 +213,14 @@ createRoot(document.getElementById("root")!).render(
                   element={
                     <Workspace>
                       <Bots />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/proposals"
+                  element={
+                    <Workspace>
+                      <Proposals />
                     </Workspace>
                   }
                 />

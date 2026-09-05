@@ -1,6 +1,7 @@
 import { useCompliance, JurisdictionNotice } from "@/compliance/ComplianceContext";
 import { StatusChip } from "@/components/StatusChip";
 import type { ConnectionState } from "@/components/StatusChip";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,9 +12,15 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { api } from "@/convex/_generated/api";
-import { formatUsd } from "@/lib/format";
+import { formatQty, formatUsd } from "@/lib/format";
 import { useQuery } from "convex/react";
-import { AlertTriangle, Info, Link2, PieChart } from "lucide-react";
+import {
+  AlertTriangle,
+  FlaskConical,
+  Info,
+  Link2,
+  PieChart,
+} from "lucide-react";
 import { Link } from "react-router";
 
 /**
@@ -23,6 +30,7 @@ import { Link } from "react-router";
  */
 export default function Portfolio() {
   const connections = useQuery(api.connections.listConnections, {}) ?? [];
+  const demo = useQuery(api.demoTrading.getDemoAccount, {});
   const { resolved } = useCompliance();
 
   const hasLive =
@@ -156,6 +164,91 @@ export default function Portfolio() {
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* Demo ledger — simulated funds, clearly separated from real views */}
+      {demo?.account && (
+        <Card className="gold-frame">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Demo account</CardTitle>
+              <Badge
+                variant="outline"
+                className="gap-1 border-amber-400/40 text-[9px] uppercase tracking-wider text-amber-300"
+              >
+                <FlaskConical className="size-3" /> simulated funds — not real
+              </Badge>
+            </div>
+            <CardDescription>
+              Separate demo ledger executed at verified live Coinbase quotes.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="rounded-md border border-border/40 bg-secondary/20 px-3 py-2">
+                <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Demo cash
+                </span>
+                <span className="font-mono-tech text-lg font-semibold">
+                  {formatUsd(demo.account.cash)}
+                </span>
+              </div>
+              <div className="rounded-md border border-border/40 bg-secondary/20 px-3 py-2">
+                <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Starting cash
+                </span>
+                <span className="font-mono-tech text-lg">
+                  {formatUsd(demo.account.startingCash)}
+                </span>
+              </div>
+              <div className="rounded-md border border-border/40 bg-secondary/20 px-3 py-2">
+                <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Positions
+                </span>
+                <span className="font-mono-tech text-lg">
+                  {demo.positions.length}
+                </span>
+              </div>
+            </div>
+            {demo.positions.length > 0 && (
+              <div className="overflow-hidden rounded-md border border-border/50">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-secondary/40 text-[10px] uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-2">Symbol</th>
+                      <th className="px-3 py-2">Qty</th>
+                      <th className="px-3 py-2">Avg price</th>
+                      <th className="px-3 py-2">Cost basis</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {demo.positions.map((p) => (
+                      <tr key={p.symbol} className="border-t border-border/40">
+                        <td className="px-3 py-2 font-mono-tech font-semibold">
+                          {p.symbol.replace("-USD", "")}
+                        </td>
+                        <td className="px-3 py-2 font-mono-tech">
+                          {formatQty(p.qty)}
+                        </td>
+                        <td className="px-3 py-2 font-mono-tech">
+                          {formatUsd(p.avgPrice)}
+                        </td>
+                        <td className="px-3 py-2 font-mono-tech">
+                          {formatUsd(p.costBasis)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
+              <Info className="mt-0.5 size-3 shrink-0" />
+              Demo funds are fictitious and never presented as real balances.
+              Manage the demo ledger from the trade desk.
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {resolved && !resolved.posture.tradingAllowed && (

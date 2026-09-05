@@ -5,11 +5,11 @@
  */
 
 import type { MutationCtx } from "./_generated/server";
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 
 export const PROPOSAL_TTL_MS = 5 * 60 * 1000;
 
-export type ProposalRow = NonNullable<Awaited<ReturnType<MutationCtx["db"]["get"]>>>;
+export type ProposalRow = Doc<"tradeProposals">;
 
 /**
  * Atomic claim: only one concurrent approval may win the PENDING row, and

@@ -5,6 +5,7 @@ import {
   Bot,
   Check,
   ChevronRight,
+  ClipboardCheck,
   Cpu,
   Globe2,
   KeyRound,
@@ -76,6 +77,11 @@ const FEATURES = [
     icon: Bot,
     title: "Trading bots",
     body: "Paper-first automation that transmits only through authorized, trading-enabled connections.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Human-approved proposals",
+    body: "Semi-automatic proposals expire in five minutes and execute only after explicit approval — on a separate demo ledger, priced at verified live quotes.",
   },
   {
     icon: Cpu,
@@ -268,7 +274,7 @@ export default function Landing() {
             The platform
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-            Eight surfaces. One orchestration layer.
+            Nine surfaces. One orchestration layer.
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

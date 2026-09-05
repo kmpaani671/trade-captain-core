@@ -23,13 +23,20 @@ import { api } from "@/convex/_generated/api";
 import { JURISDICTIONS } from "@/lib/compliance";
 import { formatDate, formatTime } from "@/lib/format";
 import { useMutation, useQuery } from "convex/react";
-import { Globe, Save, ShieldCheck, TriangleAlert } from "lucide-react";
+import {
+  Globe,
+  History,
+  Save,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Settings() {
   const settings = useQuery(api.settings.getSettings, {}) ?? null;
   const flags = useQuery(api.compliance.listFlags, {});
+  const audit = useQuery(api.auditLog.listAudit, {}) ?? [];
   const updateSettings = useMutation(api.settings.updateSettings);
   const setJurisdiction = useMutation(api.settings.setJurisdiction);
   const ensureDefaults = useMutation(api.compliance.ensureDefaults);
@@ -278,6 +285,50 @@ export default function Settings() {
           <Button onClick={() => void savePreferences()} className="gap-2 self-start">
             <Save className="size-4" /> Save preferences
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Activity log */}
+      <Card className="gold-frame">
+        <CardHeader className="pb-2">
+          <div className="flex items-center gap-2">
+            <History className="size-4 text-primary" />
+            <CardTitle className="text-base">Activity log</CardTitle>
+          </div>
+          <CardDescription>
+            Audit trail of financial events on your account (demo resets, demo
+            orders, proposal lifecycle).
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {audit.length === 0 ? (
+            <p className="rounded-md border border-dashed border-border/60 p-4 text-center text-sm text-muted-foreground">
+              No financial activity recorded yet.
+            </p>
+          ) : (
+            <div className="flex max-h-72 flex-col gap-1.5 overflow-y-auto pr-1">
+              {audit.slice(0, 30).map((row) => (
+                <div
+                  key={row._id}
+                  className="flex items-start justify-between gap-3 rounded-md border border-border/40 bg-secondary/20 px-3 py-1.5 text-xs"
+                >
+                  <span className="font-mono-tech font-medium">
+                    {row.event.replace(/_/g, " ").toLowerCase()}
+                  </span>
+                  <span className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                    {row.data && (
+                      <span className="hidden max-w-64 truncate font-mono-tech sm:inline">
+                        {row.data}
+                      </span>
+                    )}
+                    <span className="whitespace-nowrap">
+                      {formatDate(row.createdAt)} {formatTime(row.createdAt)}
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 

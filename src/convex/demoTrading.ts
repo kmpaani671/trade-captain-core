@@ -42,7 +42,7 @@ export const getDemoAccount = query({
         symbol: p.symbol,
         qty: p.qty,
         avgPrice: p.avgPrice,
-        marketValue: p.qty * p.avgPrice,
+        costBasis: p.qty * p.avgPrice,
       })),
     };
   },

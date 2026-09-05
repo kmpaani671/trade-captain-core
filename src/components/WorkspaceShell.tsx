@@ -7,6 +7,7 @@ import {
   Bot,
   LayoutDashboard,
   LineChart,
+  ListTodo,
   LogOut,
   Menu,
   ShieldCheck,
@@ -27,6 +28,7 @@ export const WORKSPACE_ROUTES = [
   { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/models", label: "AI Models", icon: Bot },
   { to: "/bots", label: "Trading Bot", icon: Bot },
+  { to: "/proposals", label: "Proposals", icon: ListTodo },
   { to: "/membership", label: "Membership", icon: ShieldCheck },
   { to: "/settings", label: "Settings", icon: Menu },
 ] as const;
