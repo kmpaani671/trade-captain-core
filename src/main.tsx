@@ -1,6 +1,8 @@
 import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
+import { WorkspaceShell } from "@/components/WorkspaceShell";
+import { ComplianceProvider } from "@/compliance/ComplianceContext";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
@@ -13,7 +15,45 @@ import "./index.css";
 const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const Trade = lazy(() => import("./pages/Trade.tsx"));
+const Portfolio = lazy(() => import("./pages/Portfolio.tsx"));
+const Wallet = lazy(() => import("./pages/Wallet.tsx"));
+const Models = lazy(() => import("./pages/Models.tsx"));
+const Bots = lazy(() => import("./pages/Bots.tsx"));
+const Membership = lazy(() => import("./pages/Membership.tsx"));
+const Settings = lazy(() => import("./pages/Settings.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
+/** Document title per route. */
+const TITLES: Record<string, string> = {
+  "/": "TradeCaptain — One terminal for every market",
+  "/auth": "Sign in — TradeCaptain",
+  "/dashboard": "Command Overview — TradeCaptain",
+  "/trade": "Trade Desk — TradeCaptain",
+  "/portfolio": "Portfolio — TradeCaptain",
+  "/wallet": "Connected Accounts — TradeCaptain",
+  "/models": "AI Models — TradeCaptain",
+  "/bots": "Trading Bots — TradeCaptain",
+  "/membership": "Membership — TradeCaptain",
+  "/settings": "Settings — TradeCaptain",
+};
+
+function TitleSync() {
+  const location = useLocation();
+  useEffect(() => {
+    document.title = TITLES[location.pathname] ?? "TradeCaptain";
+  }, [location.pathname]);
+  return null;
+}
+
+/** Authenticated workspace route: protected + shell. */
+function Workspace({ children }: { children: React.ReactNode }) {
+  return (
+    <RequireAuth>
+      <WorkspaceShell>{children}</WorkspaceShell>
+    </RequireAuth>
+  );
+}
 
 // Simple loading fallback for route transitions
 function RouteLoading() {
@@ -115,28 +155,87 @@ createRoot(document.getElementById("root")!).render(
         <VlyToolbar />
       </ToolbarErrorBoundary>
       <ConvexAuthProvider client={convex}>
-        <BrowserRouter>
-          <RouteSyncer />
-          <Suspense fallback={<RouteLoading />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route
-                path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <RequireAuth>
-                    <Dashboard />
-                  </RequireAuth>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-        <Toaster />
+        <ComplianceProvider>
+          <BrowserRouter>
+            <RouteSyncer />
+            <TitleSync />
+            <Suspense fallback={<RouteLoading />}>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route
+                  path="/auth"
+                  element={<AuthPage redirectAfterAuth="/dashboard" />}
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <Workspace>
+                      <Dashboard />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/trade"
+                  element={
+                    <Workspace>
+                      <Trade />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/portfolio"
+                  element={
+                    <Workspace>
+                      <Portfolio />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/wallet"
+                  element={
+                    <Workspace>
+                      <Wallet />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/models"
+                  element={
+                    <Workspace>
+                      <Models />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/bots"
+                  element={
+                    <Workspace>
+                      <Bots />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/membership"
+                  element={
+                    <Workspace>
+                      <Membership />
+                    </Workspace>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <Workspace>
+                      <Settings />
+                    </Workspace>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+          <Toaster />
+        </ComplianceProvider>
       </ConvexAuthProvider>
     </RootErrorBoundary>
   </StrictMode>,
